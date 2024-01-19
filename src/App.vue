@@ -8,7 +8,7 @@ import { RouterView } from 'vue-router'
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/all-orders">所有訂單</RouterLink>
     </header> -->
-    <main class="absolute top-0 left-0 right-0">
+    <main>
       <RouterView />
     </main>
   </div>

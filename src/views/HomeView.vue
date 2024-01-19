@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import OrderMenu from '@/components/OrderMenu.vue'
 import OrderInput from '@/components/OrderInput.vue'
+import VLoading from '@/components/utils/VLoading.vue'
+
 import { onMounted, ref } from 'vue'
 
-// 'https://script.google.com/macros/s/AKfycbzF44xPPgodY3a_W38GyyccM5_ctzhGIc4e4-PKb28RMln_6o0xObHMTVFHyfqFG1gCSg/exec?method=getUserOrder`
 const restaurantInfo = ref()
 const getRestaurantData = async (restaurantName: string = 'bendo') => {
   try {
@@ -26,5 +27,6 @@ onMounted(() => {
   <div class="max-w-[500px] mx-auto">
     <OrderMenu :restaurant-info="restaurantInfo" />
     <OrderInput :foods-list="restaurantInfo" />
+    <VLoading :active="!restaurantInfo" />
   </div>
 </template>

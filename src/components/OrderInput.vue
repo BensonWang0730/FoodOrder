@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AutoInput from './utils/AutoInput.vue'
 import { ref, watch } from 'vue'
+import VLoading from './utils/VLoading.vue'
 
 interface PostOrderData<T> {
   user: string
@@ -15,7 +16,7 @@ interface FoodsList {
   name: string
   price: number
 }
-
+const isLoading = ref(false)
 const props = defineProps({
   foodsList: Array as () => FoodsList[][]
 })
@@ -56,8 +57,10 @@ const setFood = (value: FoodsList, orderInputId: number) => {
 
 const postOrder = async () => {
   try {
+    isLoading.value = true
     const response = await fetch(
-      'https://script.google.com/macros/s/AKfycbzPWbGrqxLvNw3Sg2FcP2DUorOHkwmx8KaI8N-6ZoXv-TJnkH_xL_vq1x2P-HnEJDPtjw/exec',
+      'https://script.google.com/macros/s/AKfycbxgl3kDysWcRMxD5Bi--1zR7NmLXZ_RsScdwK-NJiX_IxUNgrPijyI4kyLclaTJtSKFGA/exec',
+      // 'https://script.google.com/macros/s/AKfycbzPWbGrqxLvNw3Sg2FcP2DUorOHkwmx8KaI8N-6ZoXv-TJnkH_xL_vq1x2P-HnEJDPtjw/exec',
       {
         method: 'POST',
         headers: {
@@ -71,6 +74,7 @@ const postOrder = async () => {
   } catch (error) {
     console.log(error)
   }
+  isLoading.value = false
 }
 
 const addNewInputBox = () => {
@@ -80,8 +84,6 @@ const addNewInputBox = () => {
   }
   userOrder.value.count.push(1)
   userOrder.value.food.push('')
-
-  // console.log(JSON.stringify(userOrder.value))
 }
 </script>
 <template>
@@ -93,13 +95,13 @@ const addNewInputBox = () => {
     <div class="flex flex-row gap-4 -mb-4">
       <div class="order-input w-full">
         <label for="meal">餐點</label>
-        <div v-for="(item, id) in userOrder.food" :key="id" class="mb-2">
+        <div v-for="(_item, id) in userOrder.food" :key="id" class="mb-2">
           <AutoInput :foods-list="props.foodsList" @food-emit="setFood($event, id)" />
         </div>
       </div>
       <div class="order-input w-[20%]">
         <label for="count">數量</label>
-        <div v-for="(item, id) in userOrder.count" :key="id" class="mb-2">
+        <div v-for="(_item, id) in userOrder.count" :key="id" class="mb-2">
           <input
             type="text"
             id="count"
@@ -134,6 +136,7 @@ const addNewInputBox = () => {
       </button>
     </div>
   </div>
+  <VLoading :active="isLoading" />
 </template>
 <style scoped>
 .order-input {
