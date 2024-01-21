@@ -1,4 +1,4 @@
-const debounce = (callback: Function, time: number = 500) => {
+const debounce = (callback: Function, time: number = 300) => {
   let timer: number
 
   return (...args: any) => {

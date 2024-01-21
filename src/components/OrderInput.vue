@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AutoInput from './utils/AutoInput.vue'
-import { ref, watch } from 'vue'
 import VLoading from './utils/VLoading.vue'
+import { ref, watch } from 'vue'
 
 interface PostOrderData<T> {
   user: string
@@ -16,7 +16,9 @@ interface FoodsList {
   name: string
   price: number
 }
+
 const isLoading = ref(false)
+const form = ref<HTMLFormElement | null>(null)
 const props = defineProps({
   foodsList: Array as () => FoodsList[][]
 })
@@ -50,7 +52,6 @@ watch(
 )
 
 const setFood = (value: FoodsList, orderInputId: number) => {
-  // 應該用 splice 的方式加入
   userOrder.value.food.splice(orderInputId, 1, value.name)
   userOrder.value.price.splice(orderInputId, 1, value.price)
 }
@@ -69,8 +70,10 @@ const postOrder = async () => {
         body: JSON.stringify(userOrder.value)
       }
     )
-    const data = await response.json()
-    console.log(data)
+    await response.json()
+    if (form.value) {
+      ;(form.value as HTMLFormElement).reset()
+    }
   } catch (error) {
     console.log(error)
   }
@@ -85,9 +88,15 @@ const addNewInputBox = () => {
   userOrder.value.count.push(1)
   userOrder.value.food.push('')
 }
+
+const deleteInputBox = (id: number) => {
+  userOrder.value.food.splice(id, 1)
+  userOrder.value.price.splice(id, 1)
+  userOrder.value.count.splice(id, 1)
+}
 </script>
 <template>
-  <div class="py-8 px-2 flex flex-col gap-5">
+  <div class="py-8 px-2 flex flex-col gap-5" id="form">
     <div class="order-input">
       <label for="user">訂購人</label>
       <input type="text" id="user" name="user" v-model="userOrder.user" />
@@ -95,13 +104,17 @@ const addNewInputBox = () => {
     <div class="flex flex-row gap-4 -mb-4">
       <div class="order-input w-full">
         <label for="meal">餐點</label>
-        <div v-for="(_item, id) in userOrder.food" :key="id" class="mb-2">
+        <div v-for="(item, id) in userOrder.food" :key="'item' + id" class="mb-2">
           <AutoInput :foods-list="props.foodsList" @food-emit="setFood($event, id)" />
         </div>
       </div>
-      <div class="order-input w-[20%]">
+      <div class="order-input w-[30%]">
         <label for="count">數量</label>
-        <div v-for="(_item, id) in userOrder.count" :key="id" class="mb-2">
+        <div
+          v-for="(item, id) in userOrder.food"
+          :key="'item' + id"
+          class="mb-2 flex items-center gap-3"
+        >
           <input
             type="text"
             id="count"
@@ -109,10 +122,18 @@ const addNewInputBox = () => {
             class="w-full"
             v-model.number="userOrder.count[id]"
           />
+          <button
+            v-show="userOrder.count.length > 1"
+            @click.stop="deleteInputBox(id)"
+            class="flex items-center p-2 bg-gray-100 rounded-full hover:bg-gray-200 duration-200"
+          >
+            <span class="material-symbols-outlined text-[16px]"> close </span>
+          </button>
         </div>
       </div>
     </div>
     <button
+      type="button"
       class="rounded-lg p-1 text-lg bg-gray-200 hover:bg-gray-300 duration-200 font-mediuma"
       @click="addNewInputBox"
     >
@@ -122,6 +143,7 @@ const addNewInputBox = () => {
       <label for="notes">備注</label>
       <input type="text" id="notes" name="notes" v-model="userOrder.note" />
     </div>
+    {{ userOrder }}
     <div class="flex gap-10 py-5 items-center justify-end">
       <div class="flex gap-5">
         <p>合計</p>

@@ -16,7 +16,8 @@ const addNewPrice = ref()
 
 const emit = defineEmits(['foodEmit'])
 const props = defineProps({
-  foodsList: Array as () => FoodsList[][]
+  foodsList: Array as () => FoodsList[][],
+  updateFood: String
 })
 
 const foodsList = computed(() => {
