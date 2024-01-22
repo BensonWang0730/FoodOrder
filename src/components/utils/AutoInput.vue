@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, computed, ref } from 'vue'
+import { onBeforeUnmount, onMounted, computed, ref, watch } from 'vue'
 import { debounce } from '@/components/utils/debounce'
 
 interface FoodsList {
@@ -19,6 +19,13 @@ const props = defineProps({
   foodsList: Array as () => FoodsList[][],
   updateFood: String
 })
+
+watch(
+  () => props.updateFood,
+  () => {
+    userFoodInput.value = props.updateFood
+  }
+)
 
 const foodsList = computed(() => {
   if (props.foodsList) {

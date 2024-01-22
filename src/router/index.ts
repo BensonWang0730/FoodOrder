@@ -12,7 +12,7 @@ const router = createRouter({
     {
       path: '/all-orders',
       name: 'all-orders',
-      component: () => import('../views/TestView.vue')
+      component: () => import('../views/AllOrderView.vue')
     }
   ]
 })
