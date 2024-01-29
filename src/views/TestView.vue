@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import AutoInput from '@/components/utils/AutoInput.vue'
+import { ref } from 'vue'
+const orderData = ref([200, 50, 300])
 </script>
 <template>
   <div class="py-10">
-    <AutoInput />
+    $ {{ orderData }}
+    <ul>
+      <li v-for="(order, index) in orderData" :key="index">
+        <input type="text" v-model="orderData[index]" />
+      </li>
+    </ul>
   </div>
 </template>
 <style scoped></style>

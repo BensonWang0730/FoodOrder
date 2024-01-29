@@ -9,7 +9,7 @@ const restaurantInfo = ref()
 const getRestaurantData = async (restaurantName: string = 'bendo') => {
   try {
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzwR_5_iOZv80M7B5FnPYvFmS1UcMV5TeJeR5Kx5MZOk5Us8uaoP1MDvZ_EPZqEJptZMg/exec?method=getMenu&name=${restaurantName}`
+      `https://script.google.com/macros/s/AKfycbx_KHLMm75t7LjNSLl0mD1-267TPtxxwLbI2AzFF7ZbqAJtDXn-Ib3KzJvLSAPpPvrFdQ/exec?method=getMenu&name=${restaurantName}`
     )
     const data = await response.json()
     restaurantInfo.value = data

@@ -61,7 +61,7 @@ const postOrder = async () => {
   try {
     isLoading.value = true
     const response = await fetch(
-      'https://script.google.com/macros/s/AKfycbxgl3kDysWcRMxD5Bi--1zR7NmLXZ_RsScdwK-NJiX_IxUNgrPijyI4kyLclaTJtSKFGA/exec',
+      'https://script.google.com/macros/s/AKfycbwxGbRTz99tiBQAoJUjY-zuoy7rtO_dR2-7cYDr725ILbZXVlK-hMfvReJKxYp0s2tY/exec?method=postUserOrder',
       {
         method: 'POST',
         headers: {
@@ -123,7 +123,8 @@ const deleteInputBox = (id: number) => {
           class="mb-2 flex items-center gap-3"
         >
           <input
-            type="text"
+            type="number"
+            min="1"
             id="count"
             name="count"
             class="w-full"

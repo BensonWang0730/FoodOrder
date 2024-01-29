@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, computed, ref, watch } from 'vue'
-import { debounce } from '@/components/utils/debounce'
 
 interface FoodsList {
   name: string
@@ -11,6 +10,7 @@ const fullForm = ref<HTMLElement | null>(null)
 const userFoodInput = ref()
 const dropFoodList = ref()
 
+// const foodInputStatus = ref(false)
 const showAddPirceStatus = ref(false)
 const addNewPrice = ref()
 
@@ -36,7 +36,7 @@ const foodsList = computed(() => {
   return []
 })
 
-const showAutoList = debounce((): void => {
+const showAutoList = () => {
   let filterList = null
   dropFoodList.value = null
   showAddPirceStatus.value = false
@@ -46,13 +46,12 @@ const showAutoList = debounce((): void => {
       return food.name.toLowerCase().includes(userFoodInput.value.toLowerCase())
     })
     dropFoodList.value = filterList.length > 0 ? filterList : { name: userFoodInput.value }
-    console.log('dropFoodList', dropFoodList.value)
   }
 
   if (filterList?.length === 0) {
     showAddPirceStatus.value = true
   }
-})
+}
 
 const foodSelected = (id: number) => {
   if (!showAddPirceStatus.value) {
@@ -102,10 +101,17 @@ onBeforeUnmount(() => {
     <!-- 不太了解為什麼是關閉 -->
     <form ref="fullForm" autocomplete="off" action="">
       <div class="relative">
+        <!-- 因為注音輸入時 userFoodInput 沒有值，需要等到 Enter 才能控制顯示 -->
+        <!-- <span
+          v-show="!userFoodInput"
+          class="material-symbols-outlined absolute top-0 bottom-0 flex items-center left-2 text-gray-400"
+        >
+          search
+        </span> -->
         <input
           type="text"
           id="meal"
-          placeholder="type your order here ..."
+          placeholder=" type your order here ..."
           class="w-full"
           v-model="userFoodInput"
           @keyup="showAutoList"
