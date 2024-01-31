@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import router from '@/router'
 import AutoInput from './utils/AutoInput.vue'
 import VLoading from './utils/VLoading.vue'
+import { BASE_API_POST } from './utils/api'
 import { ref, watch } from 'vue'
 
 interface PostOrderData<T> {
@@ -9,6 +11,7 @@ interface PostOrderData<T> {
   price: T[]
   count: T[]
   total: number
+  date: string
   [key: string]: string | number | T[]
 }
 
@@ -29,7 +32,8 @@ const userOrder = ref<PostOrderData<number | string>>({
   price: [],
   count: [1],
   total: 0,
-  note: ''
+  note: '',
+  date: ''
 })
 
 watch(
@@ -59,20 +63,15 @@ const setFood = (value: FoodsList, orderInputId: number) => {
 const postOrder = async () => {
   try {
     isLoading.value = true
-    const response = await fetch(
-      'https://script.google.com/macros/s/AKfycbxgl3kDysWcRMxD5Bi--1zR7NmLXZ_RsScdwK-NJiX_IxUNgrPijyI4kyLclaTJtSKFGA/exec',
-      // 'https://script.google.com/macros/s/AKfycbzPWbGrqxLvNw3Sg2FcP2DUorOHkwmx8KaI8N-6ZoXv-TJnkH_xL_vq1x2P-HnEJDPtjw/exec',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain'
-        },
-        body: JSON.stringify(userOrder.value)
-      }
-    )
-    await response.json()
+    // 直接加 excel 位置會錯亂
+    // userOrder.value.date = new Date().toISOString()
+    const data = await BASE_API_POST({ url: 'postUserOrder', data: userOrder.value })
+
     if (form.value) {
       ;(form.value as HTMLFormElement).reset()
+    }
+    if (data.status) {
+      router.push({ path: '/all-orders' })
     }
   } catch (error) {
     console.log(error)
@@ -96,7 +95,7 @@ const deleteInputBox = (id: number) => {
 }
 </script>
 <template>
-  <div class="py-8 px-2 flex flex-col gap-5" id="form">
+  <form class="py-8 px-2 flex flex-col gap-5" id="form">
     <div class="order-input">
       <label for="user">訂購人</label>
       <input type="text" id="user" name="user" v-model="userOrder.user" />
@@ -105,7 +104,11 @@ const deleteInputBox = (id: number) => {
       <div class="order-input w-full">
         <label for="meal">餐點</label>
         <div v-for="(item, id) in userOrder.food" :key="'item' + id" class="mb-2">
-          <AutoInput :foods-list="props.foodsList" @food-emit="setFood($event, id)" />
+          <AutoInput
+            :foods-list="props.foodsList"
+            :update-food="item"
+            @food-emit="setFood($event, id)"
+          />
         </div>
       </div>
       <div class="order-input w-[30%]">
@@ -116,7 +119,8 @@ const deleteInputBox = (id: number) => {
           class="mb-2 flex items-center gap-3"
         >
           <input
-            type="text"
+            type="number"
+            min="1"
             id="count"
             name="count"
             class="w-full"
@@ -124,7 +128,7 @@ const deleteInputBox = (id: number) => {
           />
           <button
             v-show="userOrder.count.length > 1"
-            @click.stop="deleteInputBox(id)"
+            @click.prevent="deleteInputBox(id)"
             class="flex items-center p-2 bg-gray-100 rounded-full hover:bg-gray-200 duration-200"
           >
             <span class="material-symbols-outlined text-[16px]"> close </span>
@@ -143,7 +147,6 @@ const deleteInputBox = (id: number) => {
       <label for="notes">備注</label>
       <input type="text" id="notes" name="notes" v-model="userOrder.note" />
     </div>
-    {{ userOrder }}
     <div class="flex gap-10 py-5 items-center justify-end">
       <div class="flex gap-5">
         <p>合計</p>
@@ -152,12 +155,12 @@ const deleteInputBox = (id: number) => {
       </div>
       <button
         class="text-[#fff] bg-gray-800 hover:bg-black duration-200 px-4 rounded-lg py-2"
-        @click="postOrder"
+        @click.prevent="postOrder"
       >
         送出
       </button>
     </div>
-  </div>
+  </form>
   <VLoading :active="isLoading" />
 </template>
 <style scoped>
