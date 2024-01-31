@@ -2,6 +2,7 @@
 import router from '@/router'
 import AutoInput from './utils/AutoInput.vue'
 import VLoading from './utils/VLoading.vue'
+import { BASE_API_POST } from './utils/api'
 import { ref, watch } from 'vue'
 
 interface PostOrderData<T> {
@@ -10,6 +11,7 @@ interface PostOrderData<T> {
   price: T[]
   count: T[]
   total: number
+  date: string
   [key: string]: string | number | T[]
 }
 
@@ -30,7 +32,8 @@ const userOrder = ref<PostOrderData<number | string>>({
   price: [],
   count: [1],
   total: 0,
-  note: ''
+  note: '',
+  date: ''
 })
 
 watch(
@@ -60,17 +63,10 @@ const setFood = (value: FoodsList, orderInputId: number) => {
 const postOrder = async () => {
   try {
     isLoading.value = true
-    const response = await fetch(
-      'https://script.google.com/macros/s/AKfycbwxGbRTz99tiBQAoJUjY-zuoy7rtO_dR2-7cYDr725ILbZXVlK-hMfvReJKxYp0s2tY/exec?method=postUserOrder',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain'
-        },
-        body: JSON.stringify(userOrder.value)
-      }
-    )
-    const data = await response.json()
+    // 直接加 excel 位置會錯亂
+    // userOrder.value.date = new Date().toISOString()
+    const data = await BASE_API_POST({ url: 'postUserOrder', data: userOrder.value })
+
     if (form.value) {
       ;(form.value as HTMLFormElement).reset()
     }

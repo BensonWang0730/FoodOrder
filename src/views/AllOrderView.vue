@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
 import VLoading from '@/components/utils/VLoading.vue'
+import { BASE_API_GET, BASE_API_POST } from '@/components/utils/api'
 import { computed, onMounted, ref, watch } from 'vue'
 import { debounce } from '@/components/utils/debounce'
 
@@ -10,11 +11,7 @@ const totalMoneny = ref()
 
 const getUserOrder = async () => {
   try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbx_KHLMm75t7LjNSLl0mD1-267TPtxxwLbI2AzFF7ZbqAJtDXn-Ib3KzJvLSAPpPvrFdQ/exec?method=getUserOrder`
-    )
-    const data = await response.json()
-
+    const data = await BASE_API_GET({ url: 'getUserOrder' })
     userOrderData.value = sortOrderData(data)
     countFoodData.value = countAllOrder(data)
   } catch (error) {
@@ -68,7 +65,7 @@ const newUserOrderData = computed(() => {
 
 watch(
   () => newUserOrderData.value,
-  (newValue, oldValue) => {
+  debounce((newValue, oldValue) => {
     if (!oldValue.length) return
 
     for (let i = 0; i < newUserOrderData.value.length; i++) {
@@ -82,28 +79,18 @@ watch(
         }
         console.log('Paid has changed:', userName, newValue[i]?.[1][0].paid)
 
-        // 要加 debounce
-        debounce(editUserOrder(data, 500))
+        editUserOrder(data)
         // getUserOrder()  // 這樣會變 dead loop
       }
     }
-  },
+  }, 500),
   { deep: true }
 )
 
 const editUserOrder = async (data: Object) => {
   try {
-    const response = await fetch(
-      'https://script.google.com/macros/s/AKfycbwxGbRTz99tiBQAoJUjY-zuoy7rtO_dR2-7cYDr725ILbZXVlK-hMfvReJKxYp0s2tY/exec?method=editUserPaid',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain'
-        },
-        body: JSON.stringify(data)
-      }
-    )
-    console.log(response)
+    await BASE_API_POST({ url: 'editUserPaid', data })
+    getUserOrder()
   } catch (error) {
     console.log(error)
   }

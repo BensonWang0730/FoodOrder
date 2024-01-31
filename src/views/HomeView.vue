@@ -1,17 +1,16 @@
 <script setup lang="ts">
+import { BASE_API_GET } from '@/components/utils/api'
 import OrderMenu from '@/components/OrderMenu.vue'
 import OrderInput from '@/components/OrderInput.vue'
 import VLoading from '@/components/utils/VLoading.vue'
+import SelectRestaurant from '@/components/SelectRestaurant.vue'
 
 import { onMounted, ref } from 'vue'
 
 const restaurantInfo = ref()
 const getRestaurantData = async (restaurantName: string = 'bendo') => {
   try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbx_KHLMm75t7LjNSLl0mD1-267TPtxxwLbI2AzFF7ZbqAJtDXn-Ib3KzJvLSAPpPvrFdQ/exec?method=getMenu&name=${restaurantName}`
-    )
-    const data = await response.json()
+    const data = await BASE_API_GET({ url: `getMenu&name=${restaurantName}` })
     restaurantInfo.value = data
   } catch (error) {
     console.log(error)
@@ -28,5 +27,6 @@ onMounted(() => {
     <OrderMenu :restaurant-info="restaurantInfo" />
     <OrderInput :foods-list="restaurantInfo" />
     <VLoading :active="!restaurantInfo" />
+    <SelectRestaurant />
   </div>
 </template>
