@@ -71,7 +71,7 @@ const newUserOrderData = computed(() => {
 
 watch(
   () => newUserOrderData.value,
-  debounce((newValue, oldValue) => {
+  debounce((newValue: any, oldValue: any) => {
     if (!oldValue.length) return
 
     for (let i = 0; i < newUserOrderData.value.length; i++) {
@@ -164,7 +164,10 @@ onMounted(() => {
               </td>
               <td>
                 <p class="rounded-lg px-2" :class="{ 'bg-[#dc354667]': element[1][0].makeChange }">
-                  <span>$ </span>{{ element[1][0].makeChange }}
+                  <span>$ </span>
+
+                  {{ element[1][0].makeChange }}
+                  <!-- {{ (element[1][0].makeChange = element[1][0].paid - element[1][0].total) }} -->
                 </p>
               </td>
             </tr>
