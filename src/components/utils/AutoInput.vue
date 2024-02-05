@@ -15,10 +15,10 @@ const showAddPirceStatus = ref(false)
 const addNewPrice = ref()
 
 const emit = defineEmits(['foodEmit'])
-const props = defineProps({
-  foodsList: Array as () => FoodsList[][],
-  updateFood: String
-})
+const props = defineProps<{
+  foodsList?: FoodsList[][]
+  updateFood?: string
+}>()
 
 watch(
   () => props.updateFood,
