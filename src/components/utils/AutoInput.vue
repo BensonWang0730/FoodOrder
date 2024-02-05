@@ -17,7 +17,7 @@ const addNewPrice = ref()
 const emit = defineEmits(['foodEmit'])
 const props = defineProps<{
   foodsList?: FoodsList[][]
-  updateFood?: string
+  updateFood?: any
 }>()
 
 watch(
