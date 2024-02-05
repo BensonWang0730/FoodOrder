@@ -12,21 +12,24 @@ const totalMoneny = ref()
 const getUserOrder = async () => {
   try {
     const data = await BASE_API_GET({ url: 'getUserOrder' })
-    userOrderData.value = sortOrderData(data)
-    countFoodData.value = countAllOrder(data)
+    userOrderData.value = sortOrderData(data as [])
+    countFoodData.value = countAllOrder(data as [])
   } catch (error) {
     console.log(error)
   }
 }
 
 const sortOrderData = (data: []) => {
-  const groupByData = data.reduce((group, order) => {
-    const { userName } = order
+  const groupByData = data.reduce(
+    (group, order) => {
+      const { userName } = order
 
-    group[userName] = group[userName] ?? []
-    group[userName].push(order)
-    return group
-  }, {})
+      group[userName] = group[userName] ?? []
+      group[userName].push(order)
+      return group
+    },
+    {} as Record<string, []>
+  )
 
   return Object.entries(groupByData)
 }
@@ -35,16 +38,19 @@ const countAllOrder = (data: []) => {
   const uniqueUserName = new Set()
   let sum = 0
 
-  const countData = data.reduce((group, order) => {
-    const { food, count, total, userName } = order
+  const countData = data.reduce(
+    (group, order) => {
+      const { food, count, total, userName } = order
 
-    group[food] = (group[food] || 0) + count
-    if (!uniqueUserName.has(userName)) {
-      uniqueUserName.add(userName)
-      sum += total
-    }
-    return group
-  }, {})
+      group[food] = (group[food] || 0) + count
+      if (!uniqueUserName.has(userName)) {
+        uniqueUserName.add(userName)
+        sum += total
+      }
+      return group
+    },
+    {} as Record<string, number>
+  )
 
   const resultArray = Object.keys(countData).map((food) => ({
     food,
